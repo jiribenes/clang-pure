@@ -493,6 +493,42 @@ typeElementType t = uderef t $ \tp -> do
     then return Nothing
     else (Just . Type) <$> newLeaf (parent t) (\_ -> return ( etp, free etp ))
 
+typeResultType :: Type -> Maybe Type
+typeResultType t = uderef t $ \tp -> do
+  rtp <- [C.block| CXType* {
+    CXType type = clang_getResultType(*$(CXType *tp));
+
+    if (type.kind == CXType_Invalid) {
+      return NULL;
+    }
+
+    return ALLOC(type);
+    } |]
+  if rtp == nullPtr
+    then return Nothing
+    else (Just . Type) <$> newLeaf (parent t) (\_ -> return ( rtp, free rtp ))
+
+typeArgType :: Type -> Int -> Maybe Type
+typeArgType t i = uderef t $ \tp -> do
+  let ix = CUInt (fromIntegral i)
+  atp <- [C.block| CXType* {
+    CXType type = clang_getArgType(*$(CXType *tp), $(unsigned int ix));
+
+    if (type.kind == CXType_Invalid) {
+      return NULL;
+    }
+
+    return ALLOC(type);
+    } |]
+  if atp == nullPtr
+    then return Nothing
+    else (Just . Type) <$> newLeaf (parent t) (\_ -> return ( atp, free atp ))
+
+typeGetNumArgs :: Type -> Maybe Int
+typeGetNumArgs t = uderef t $ \tp -> do
+  num <- [C.exp| int { clang_getNumArgTypes(*$(CXType *tp)) } |]
+  return $ if num == -1 then Nothing else Just $ fromIntegral num
+
 typeKind :: Type -> TypeKind
 typeKind t = uderef t $ fmap parseTypeKind . #peek CXType, kind
 
