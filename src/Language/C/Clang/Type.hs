@@ -20,6 +20,9 @@ module Language.C.Clang.Type
   , typeCanonicalType
   , typeElementType
   , typePointeeType
+  , typeResultType
+  , typeGetNumArgs
+  , typeArgTypes
   , typeSizeOf
   , typeSpelling
   , typeKind
@@ -29,3 +32,11 @@ where
 
 import Language.C.Clang.Internal.FFI
 import Language.C.Clang.Internal.Types
+
+{-| Returns all argument types (ordered) for a function type given
+ -  or Nothing if given type is not a function type.
+ -
+ -  Uses internal unsafe 'typeGetArgType' which gets arg by index.
+ -}
+typeArgTypes :: Type -> Maybe [Type]
+typeArgTypes t = typeGetNumArgs t >>= (\num -> mapM (typeArgType t) [0..num - 1])
