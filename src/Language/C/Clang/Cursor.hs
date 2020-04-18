@@ -34,6 +34,7 @@ module Language.C.Clang.Cursor
   , cursorLocation
   , cursorUSR
   , cursorReferenced
+  , cursorCanonical
   , cursorType
   , cursorKind
 
