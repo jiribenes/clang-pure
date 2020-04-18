@@ -7,7 +7,7 @@
 }:
 mkDerivation {
   pname = "clang-pure";
-  version = "0.2.0.6";
+  version = "0.2.0.7";
   src = ./.;
   isLibrary = true;
   isExecutable = true;
