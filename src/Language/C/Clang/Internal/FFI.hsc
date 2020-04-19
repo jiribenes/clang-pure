@@ -242,8 +242,7 @@ cursorReferenced c = uderef c $ \cp -> do
     then (Just . Cursor) <$> newLeaf (parent c) (\_ -> return ( rcp, free rcp ))
     else return Nothing
 
--- TODO: Does this ever return Nothing?
-cursorCanonical :: Cursor -> Maybe Cursor
+cursorCanonical :: Cursor -> Cursor
 cursorCanonical c = uderef c $ \cp -> do
   ccp <- [C.block| CXCursor* {
     CXCursor ref = clang_getCanonicalCursor(*$(CXCursor *cp));
@@ -254,8 +253,8 @@ cursorCanonical c = uderef c $ \cp -> do
     return ALLOC(ref);
     } |]
   if ccp /= nullPtr
-    then (Just . Cursor) <$> newLeaf (parent c) (\_ -> return ( ccp, free ccp ))
-    else return Nothing
+    then Cursor <$> newLeaf (parent c) (\_ -> return ( ccp, free ccp ))
+    else error "Unexpected null pointer from getCanonicalCursor"
 
 rangeStart, rangeEnd :: SourceRange -> SourceLocation
 rangeStart sr = uderef sr $ \srp -> do
