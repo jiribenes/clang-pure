@@ -21,6 +21,7 @@ module Language.C.Clang.Token
   , tokenSetTokens
   , indexTokenSet
   , tokenSpelling
+  , tokenExtent
   )
 where
 

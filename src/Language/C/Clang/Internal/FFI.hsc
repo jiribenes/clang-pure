@@ -744,6 +744,26 @@ tokenSpelling t = unsafePerformIO $
             *$(CXToken *tp));
           } |]
 
+tokenExtent :: Token -> Maybe SourceRange
+tokenExtent tok =
+    uderef (parent tok) $ \tup ->
+        deref tok $ \tp -> do
+            srp <- [C.block| CXSourceRange* {
+                CXSourceRange sr = clang_getTokenExtent($(CXTranslationUnit tup), *$(CXToken *tp));
+                if (clang_Range_isNull(sr)) {
+                    return NULL;
+                }
+
+                return ALLOC(sr);
+            } |]
+            if srp == nullPtr
+               then return Nothing
+               else do
+                   srn <- newLeaf (parent tok) $ \_ ->
+                       return (srp, free srp)
+                   return $ Just $ SourceRange srn    
+
+
 isInSystemHeader :: SourceLocation -> Bool
 isInSystemHeader l = uderef l $ \lp ->
   toBool <$> [C.exp| int {
