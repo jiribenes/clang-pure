@@ -20,6 +20,7 @@ module Language.C.Clang.TranslationUnit
   , UnsavedFile
   , parseTranslationUnit
   , parseTranslationUnitWithOptions
+  , hasDiagnostics
   )
 where
 

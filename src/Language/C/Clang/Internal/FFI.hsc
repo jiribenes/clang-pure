@@ -157,6 +157,13 @@ translationUnitCursor tu = unsafePerformIO $ do
     return ( cp, free cp )
   return $ Cursor cn
 
+-- | Calls @clang_getNumDiagnostics@, returns 'True' if there's at least one diagnostic.
+hasDiagnostics :: TranslationUnit -> Bool
+hasDiagnostics tu = uderef tu $ \tup ->
+  toBool <$> [C.exp| unsigned int {
+    clang_getNumDiagnostics($(CXTranslationUnit tup))
+    } |]
+
 cursorTranslationUnit :: Cursor -> TranslationUnit
 cursorTranslationUnit (Cursor c) = parent c
 
