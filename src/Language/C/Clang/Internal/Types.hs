@@ -18,6 +18,11 @@ limitations under the License.
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE CPP #-}
+
+#if MIN_VERSION_base(4, 14, 0)
+{-# LANGUAGE StandaloneKindSignatures #-}
+#endif
 
 module Language.C.Clang.Internal.Types where
 
